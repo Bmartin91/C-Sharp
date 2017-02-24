@@ -1,0 +1,81 @@
+public static string PhoneNum(TextBox phone)
+{
+	string result = "";
+
+	if (phone.TextLength > 0)
+	{
+		if (IsValidPhone(phone))
+		{
+			result = CreatePhoneNum(phone);
+		}
+	}
+
+	return result;
+}
+
+private static bool IsValidPhone(TextBox text)
+{
+	char l;
+	int i;
+	int temp;
+	string result = "";
+
+	for (i = 0; i < text.TextLength; i++)
+	{
+		l = text.Text[i];
+
+		try
+		{
+			temp = int.Parse(l.ToString());
+			result += temp.ToString();
+		}
+
+		catch
+		{
+			// do nothing if the character is not a number
+		}
+	}
+
+	if (result.Length == 10)
+	{
+		return true;
+	}
+
+	else
+	{
+		MessageBox.Show("Phone number was an incorrect number of digits.  It should be in a number only format consisting of 10 numbers.  Ex. 1234567890", "Incorrect Format", MessageBoxButtons.OK, MessageBoxIcon.Error);
+		return false;
+	}
+}
+
+private static string CreatePhoneNum(TextBox text)
+{
+	int i;
+	int temp;
+	char l;
+	string num = "";
+
+	for (i = 0; i < text.TextLength; i++)
+	{
+		l = text.Text[i];
+
+		try
+		{
+			temp = int.Parse(l.ToString());
+			num += temp.ToString();
+		}
+
+		catch
+		{
+			// do nothing if the character is not a number
+		}
+	}
+
+	StringBuilder result = new StringBuilder(num); ;
+
+	result.Insert(0, '(');
+	result.Insert(4, ") ");
+	result.Insert(9, '-');
+
+	return result.ToString();
+}
