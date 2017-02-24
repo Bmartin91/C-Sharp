@@ -1,0 +1,56 @@
+private void DisplayInfo()
+{
+	List<ChartInfo> cht = null;
+
+	/*  ChartInfo is a class I created that has the info I will put into the chart  
+		The first 3 if statements determine which List of data I am going to use for my chart
+																								*/
+	if (cmbBoxSearchStyle.SelectedIndex == 0)
+		cht = cntPerTerm;
+
+	if (cmbBoxSearchStyle.SelectedIndex == 1)
+		cht = cntPerAdv;
+
+	if (cmbBoxSearchStyle.SelectedIndex == 2)
+		cht = hrsPerAdv;
+
+	if (chkBoxShowPayBreakdown.Checked == false)
+		DisplayAsSingleBar(cht);
+
+	else
+		DisplayAsStackedBar(cht);
+
+		// Set up chart view
+		chartHourBreakdown.ChartAreas["ChartArea1"].AxisX.Interval = 1;             //  Makes the graph show the label for every bar on the graph.  By default (set to 0) it may show every other one
+		chartHourBreakdown.ChartAreas["ChartArea1"].AxisX.MajorGrid.LineWidth = 0;  //  Makes the graph not show lines running up and down the graph
+		chartHourBreakdown.ChartAreas["ChartArea1"].AxisY.MajorGrid.LineWidth = 0;  //  Makes the graph not show lines running side to side on the graph
+		chartHourBreakdown.ChartAreas["ChartArea1"].Area3DStyle.Enable3D = chkBoxEnable3D.Checked;  //  Shows the graph as a 3D graph.  I actually have a checkbox on my form that allows the user to change this setting
+
+		foreach (Series s in chartHourBreakdown.Series) // This code makes any label that is a 0 not appear
+		{
+			foreach (DataPoint p in s.Points)
+			{
+				if (p.YValues[0] == 0)
+				{
+					p.IsValueShownAsLabel = false;      //  Turns off the label if it is 0
+				}
+			}
+		}
+}
+
+private void DisplayAsSingleBar(List<ChartInfo> cht)
+{
+	Dictionary<string, double> info = null;  //  This dictionary will contain the info to display.  The string is the label and the double is the number to graph
+
+	chartHourBreakdown.Series.Clear();      //  Clear the chart in order to display new info
+	chartHourBreakdown.Series.Add("Total"); //  Adds the Series "Total" to the graph.  This is what will apear in the legend.  You can have more than one series, and that would display as a stacked bar chart
+	chartHourBreakdown.Series["Total"].ChartType = SeriesChartType.StackedColumn;
+	chartHourBreakdown.Series["Total"].IsValueShownAsLabel = true;
+
+	info = CombineHours(cht);  //  This method takes the List of CharInfo objects and extracts the data it needs in order to get the bar label and the data point to graph
+   
+	foreach (KeyValuePair<string, double> k in info)
+	{
+		chartHourBreakdown.Series["Total"].Points.AddXY(k.Key, k.Value);  //  Adds the info to the graph.
+	}
+}
